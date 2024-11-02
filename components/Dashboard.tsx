@@ -7,7 +7,7 @@ const Dashboard = () => {
 
 
     return (
-        <div className='bg-slate-900 w-full h-screen flex flex-col items-center justify-center'>
+        <>
             {session ? (
                 <>  
                     <img src={session.user?.image as string} alt="user" className='rounded-full h-20 w-20' />
@@ -22,7 +22,7 @@ const Dashboard = () => {
                     <button onClick={() => signIn('github')} className='border border-black rounded-lg p-2 hover:animate-pulse hover:text-white mt-5'>Login with Github</button>
                 </>
             )}
-        </div>
+        </>
     )
 }
 
