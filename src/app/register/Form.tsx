@@ -16,23 +16,24 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { toast } from 'sonner'
 
 const formSchema = z.object({
-  email: z.string().min(2, {
+  email: z.string().min(1, {
     message: "This field has to be filled."
   })
-  .email("Please enter a valid email address.")
-  .max(300, {
-    message: "Password must be less than 300 characters."
-  }),
-  Password: z.string().min(6, {
+    .email("Please enter a valid email address.")
+    .max(300, {
+      message: "Password must be less than 300 characters."
+    }),
+  password: z.string().min(6, {
     message: "Password must be at least 6 characters."
   }),
   confirmPassword: z.string().min(6, {
     message: "Password must be at least 6 characters."
   })
-}).superRefine(({Password, confirmPassword}, ctx) => {
-  if (Password !== confirmPassword) {
+}).superRefine(({ password, confirmPassword }, ctx) => {
+  if (password !== confirmPassword) {
     ctx.addIssue({
       code: "custom",
       message: "Passwords do not match.",
@@ -49,8 +50,16 @@ const RegisterForm = () => {
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const response = await fetch('/api/auth/register',
+      { method: 'POST', body: JSON.stringify(values) })
+
+    const data = await response.json();
+    if (data.error) {
+      toast.error(data.error)
+    } 
+
+    toast.success('Account has been created')
   }
 
 
@@ -59,7 +68,7 @@ const RegisterForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name ="email"
+          name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
@@ -75,7 +84,7 @@ const RegisterForm = () => {
         />
         <FormField
           control={form.control}
-          name ="Password"
+          name="password"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
@@ -83,7 +92,7 @@ const RegisterForm = () => {
                 <Input type="password" {...field} />
               </FormControl>
               <FormDescription>
-                This is your password, DO NOT SHARE IT. 
+                This is your password, DO NOT SHARE IT.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -91,7 +100,7 @@ const RegisterForm = () => {
         />
         <FormField
           control={form.control}
-          name ="confirmPassword"
+          name="confirmPassword"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
@@ -99,7 +108,7 @@ const RegisterForm = () => {
                 <Input type="password" {...field} />
               </FormControl>
               <FormDescription>
-                Re-type your password in to confirm. 
+                Re-type your password in to confirm.
               </FormDescription>
               <FormMessage />
             </FormItem>
